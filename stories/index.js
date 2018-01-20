@@ -18,6 +18,13 @@ storiesOf('Alert', module)
   ))
 
 storiesOf('Tile', module)
-  .add('default', () => (
-    <ThemeProvider theme={theme}><Tile /></ThemeProvider>
+  .add('hidden', () => (
+    <ThemeProvider theme={theme}>
+      <Tile handleClick={action('clicked')} />
+    </ThemeProvider>
+  ))
+  .add('visible', () => (
+    <ThemeProvider theme={theme}>
+      <Tile backFaceIsVisible handleClick={action('clicked')} />
+    </ThemeProvider>
   ))

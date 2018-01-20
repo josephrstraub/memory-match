@@ -5,6 +5,7 @@ import Enzyme, { shallow, mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import App from './'
 import Alert, { Button } from '../Alert'
+import Tile from '../Tile'
 
 Enzyme.configure({ adapter: new Adapter() })
 
@@ -32,20 +33,72 @@ it('starts the game once the user hits the confirmation button', () => {
 })
 
 it('starts the game with 12 tiles', () => {
-  const component = mount(<App />)
-  component.find(Alert).find(Button).simulate('click')
+  const component = shallow(<App />)
+  component.instance().startGame({ preventDefault: jest.fn() })
   expect(component.instance().state.tiles.length).toEqual(12)
 })
 
-it('flips a tile when it is clicked', () => {})
+it('should give an id to every tile', () => {
+  const component = shallow(<App />)
+  component.instance().startGame({ preventDefault: jest.fn() })
+  const tiles = component.instance().state.tiles
+  expect(tiles.every(tile => tile.hasOwnProperty('id'))).toEqual(true)
+})
 
-it('does not flip a tile when it is clicked if the game is not active', () => {})
+it('should match tiles in pairs of two using an id', () => {
+  const component = shallow(<App />)
+  component.instance().startGame({ preventDefault: jest.fn() })
+  const tiles = component.instance().state.tiles
+  const ids = { }
+  tiles.forEach(tile => {
+    if (ids[tile.id]) {
+      ids[tile.id] += 1
+    } else {
+      ids[tile.id] = 1
+    }
+  })
+  expect(Object.values(ids).every(value => value === 2)).toEqual(true)
+})
 
-it('does not flip a tile when it is clicked if it is already matched to another tile', () => {})
+it('flips a tile when it is clicked', () => {
+  const component = mount(<App />)
+  component.instance().startGame({ preventDefault: jest.fn() })
+  component.first(Tile).simulate('click')
+  expect(component.instance().state.tiles[0].backFaceIsVisible).toEqual(true)
+})
 
-it('does not flip a tile when it is clicked if it is the third tile clicked on the current turn', () => {})
+// it('does not flip a tile when it is clicked if the game is not active', () => {
+//   const component = shallow(<App />)
+//   component.instance().startGame({ preventDefault: jest.fn() })
+//   component.instance().handleTileClick(0, 0)
+// })
 
-it('sets tiles as matched if user clicks two of the same tile', () => {})
+it('does not flip a tile when it is clicked if it is already visible', () => {
+    const component = shallow(<App />)
+    component.setState({
+      tiles: [
+        { id: 0, backFaceIsVisible: true }
+      ]
+    })
+    component.instance().handleTileClick({ backFaceIsVisible: true }, 0)
+    expect(component.instance().state.tiles[0].backFaceIsVisible).toEqual(true)
+})
+
+it('sets tiles as matched if user clicks two of the same tile', () => {
+  const component = shallow(<App />)
+  component.instance().startGame({ preventDefault: jest.fn() })
+  component.setState({
+    tiles: [
+      { ...component.instance().state.tiles[0], id: 0 },
+      { ...component.instance().state.tiles[1], id: 0 },
+      ...component.instance().state.tiles.slice(2)
+    ]
+  })
+  component.instance().handleTileClick(component.instance().state.tiles[0], 0)
+  component.instance().handleTileClick(component.instance().state.tiles[1], 1)
+  expect(component.instance().state.tiles[0].isMatched).toEqual(true)
+  expect(component.instance().state.tiles[1].isMatched).toEqual(true)
+})
 
 it('ends the game if user fails to complete in allotted time', () => {})
 
