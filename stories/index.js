@@ -1,13 +1,23 @@
-import React from 'react';
+import React from 'react'
+import { storiesOf } from '@storybook/react'
+import { action } from '@storybook/addon-actions'
+import { ThemeProvider } from 'styled-components'
+import Alert from '../src/components/Alert'
+import Tile from '../src/components/Tile'
+import { theme } from '../src/components/App'
 
-import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
-import { linkTo } from '@storybook/addon-links';
+storiesOf('Alert', module)
+  .add('default', () => (
+    <ThemeProvider theme={theme}>
+      <Alert
+        buttonText="Got it!"
+        handleDismiss={action('clicked')}
+        message="Click a square to reveal it, then find its match. Finish before time runs out!"
+      />
+    </ThemeProvider>
+  ))
 
-import { Button, Welcome } from '@storybook/react/demo';
-
-storiesOf('Welcome', module).add('to Storybook', () => <Welcome showApp={linkTo('Button')} />);
-
-storiesOf('Button', module)
-  .add('with text', () => <Button onClick={action('clicked')}>Hello Button</Button>)
-  .add('with some emoji', () => <Button onClick={action('clicked')}>😀 😎 👍 💯</Button>);
+storiesOf('Tile', module)
+  .add('default', () => (
+    <ThemeProvider theme={theme}><Tile /></ThemeProvider>
+  ))
