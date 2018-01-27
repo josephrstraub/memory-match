@@ -16,7 +16,7 @@ const Container = styled.div`
   margin: auto;
 `
 
-const Message = styled.p`
+export const Message = styled.p`
   color: ${props => props.theme.blue};
   margin: 0 auto 50px auto;
 `

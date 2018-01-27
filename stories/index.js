@@ -3,6 +3,7 @@ import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import { ThemeProvider } from 'styled-components'
 import Alert from '../src/components/Alert'
+import Clock from '../src/components/Clock'
 import Tile from '../src/components/Tile'
 import { theme } from '../src/components/App'
 
@@ -14,6 +15,13 @@ storiesOf('Alert', module)
         handleDismiss={action('clicked')}
         message="Click a square to reveal it, then find its match. Finish before time runs out!"
       />
+    </ThemeProvider>
+  ))
+
+storiesOf('Clock', module)
+  .add('default', () => (
+    <ThemeProvider theme={theme}>
+      <Clock display="40" />
     </ThemeProvider>
   ))
 

@@ -3,6 +3,7 @@ import * as React from 'react'
 import _ from 'lodash'
 import styled, { ThemeProvider } from 'styled-components'
 import Alert from '../Alert'
+import Clock from '../Clock'
 import Tile from '../Tile'
 import iconNames from '../../constants/icons-names'
 
@@ -19,7 +20,11 @@ const TileContainer = styled.div`
 
 type State = {
   gameIsActive: boolean,
-  tiles: []
+  intervalId: any,
+  numberOfVisibleUnmatchedTiles: number,
+  roundsCompleted: 0,
+  tiles: [],
+  timeRemaining: number
 }
 
 class App extends React.Component<State> {
@@ -27,19 +32,68 @@ class App extends React.Component<State> {
     super()
     this.state = {
       gameIsActive: false,
-      numberOfVisibleTiles: 0,
-      tiles: []
+      intervalId: null,
+      numberOfVisibleUnmatchedTiles: 0,
+      roundsCompleted: 0,
+      tiles: [],
+      timeRemaining: 40
     }
   }
 
-  handleTileClick: Function = (selectedTile, index) => {
-    if (!selectedTile.backFaceIsVisible) {
+  componentDidUpdate: Function = () => {
+    if (this.state.timeRemaining === 0 && this.state.gameIsActive) {
+      this.setState({ gameIsActive: false })
+      clearInterval(this.state.intervalId)
+    }
+  }
+
+  checkForRoundCompletion: Function = () => {
+    if (this.state.tiles.every(tile => tile.isMatched)) {
+      this.endRound()
+    }
+  }
+
+  endRound: Function = () => {
+    clearInterval(this.state.intervalId)
+    this.setState(
+      { gameIsActive: false, roundsCompleted: this.state.roundsCompleted + 1 },
+      this.startGame
+    )
+  }
+
+  getNumberOfTiles: Function = (roundsCompleted: number) => {
+    if (roundsCompleted < 3) {
+      return 12
+    }
+    if (roundsCompleted >= 6) {
+      return 30
+    }
+    return 20
+  }
+
+  getRoundDuration: Function = (roundsCompleted: number) => {
+    const NUMBER_OF_TIERS = 3
+    const MINIMUM_DURATION = 5
+    if (roundsCompleted > 8) {
+      return Math.max(28 - roundsCompleted, MINIMUM_DURATION)
+    }
+    const tier = (roundsCompleted % NUMBER_OF_TIERS) + 1
+    if (tier === 1) {
+      return 40
+    } else if (tier === 2) {
+      return 30
+    }
+    return 20
+  }
+
+  handleTileClick: Function = (selectedTile: Object, index: number) => {
+    if (!selectedTile.backFaceIsVisible && this.state.numberOfVisibleUnmatchedTiles !== 2) {
       const isMatched = this.state.tiles.some(tile => tile.id === selectedTile.id
         && tile.backFaceIsVisible
       )
       this.setState(
         {
-          numberOfVisibleTiles: this.state.numberOfVisibleTiles + 1,
+          numberOfVisibleUnmatchedTiles: this.state.numberOfVisibleUnmatchedTiles + 1,
           tiles: this.state.tiles.map((tile, i) => ({
             ...tile,
             backFaceIsVisible: i === index || tile.backFaceIsVisible,
@@ -47,8 +101,14 @@ class App extends React.Component<State> {
           }))
         },
         () => {
-          if (this.state.numberOfVisibleTiles === 2) {
-            this.resetTurn()
+          if (this.state.numberOfVisibleUnmatchedTiles === 2) {
+            setTimeout(
+              () => {
+                this.resetTurn()
+                this.checkForRoundCompletion()
+              },
+              2000
+            )
           }
         }
       )
@@ -57,7 +117,7 @@ class App extends React.Component<State> {
 
   resetTurn: Function = () => {
     this.setState({
-      numberOfVisibleTiles: 0,
+      numberOfVisibleUnmatchedTiles: 0,
       tiles: this.state.tiles.map(tile => ({
         ...tile,
         backFaceIsVisible: tile.isMatched
@@ -65,28 +125,51 @@ class App extends React.Component<State> {
     })
   }
 
-  startGame: Function = (event) => {
-    event.preventDefault()
-    this.setState({
-      gameIsActive: true,
-      tiles: _.shuffle(iconNames).slice(0, 6).reduce((tiles, iconName, index) => {
-        return [
-          ...tiles,
-          { id: index, iconName, backFaceIsVisible: false, isMatched: false },
-          { id: index, iconName, backFaceIsVisible: false, isMatched: false }
-        ]
-      }, [])
-    })
+  startGame: Function = (roundsCompleted = this.state.roundsCompleted) => {
+    const numberOfDistinctIcons = this.getNumberOfTiles(roundsCompleted) / 2
+    this.setState(
+      {
+        gameIsActive: true,
+        roundsCompleted,
+        tiles: _.shuffle(iconNames)
+          .slice(0, numberOfDistinctIcons)
+          .reduce((tiles, iconName, index) => {
+            return [
+              ...tiles,
+              { id: index, iconName, backFaceIsVisible: false, isMatched: false },
+              { id: index, iconName, backFaceIsVisible: false, isMatched: false }
+            ]
+          }, []),
+        timeRemaining: this.getRoundDuration(roundsCompleted)
+      },
+      () => {
+        const intervalId = setInterval(
+          () => this.setState({ timeRemaining: this.state.timeRemaining - 1 }),
+          1000
+        )
+        this.setState({ intervalId })
+      }
+    )
   }
 
   render() {
-    const message = 'Click a square to reveal it, then find its match. Finish before time runs out!'
+    const defaultMessage = 'Click a square to reveal it, then find its match. Finish before time runs out!'
+    const statsMessage = `Good effort. You completed ${this.state.roundsCompleted} rounds.`
+
     return (
       <ThemeProvider theme={theme}>
         <div>
+          <Clock display={this.state.timeRemaining} />
           <div>
             { !this.state.gameIsActive && (
-              <Alert buttonText="Got it!" handleDismiss={this.startGame} message={message} />
+              <Alert
+                buttonText={this.state.roundsCompleted ? 'Go again' : 'Got it!'}
+                handleDismiss={(event) => {
+                  event.preventDefault()
+                  this.startGame(0)
+                }}
+                message={this.state.roundsCompleted ? statsMessage : defaultMessage}
+              />
             )}
           </div>
           <TileContainer>
