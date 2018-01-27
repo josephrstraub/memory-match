@@ -1,22 +1,12 @@
 /* @flow */
 import * as React from 'react'
 import _ from 'lodash'
-import styled, { ThemeProvider } from 'styled-components'
+import { ThemeProvider } from 'styled-components'
+import { TileContainer, theme } from './styled'
 import Alert from '../Alert'
 import Clock from '../Clock'
 import Tile from '../Tile'
 import iconNames from '../../constants/icons-names'
-
-export const theme = {
-  blue: '#359DED'
-}
-
-const TileContainer = styled.div`
-  margin: auto;
-  max-width: 440px;
-  display: inline-flex;
-  flex-wrap: wrap;
-`
 
 type State = {
   gameIsActive: boolean,

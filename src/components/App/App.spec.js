@@ -4,7 +4,8 @@ import renderer from 'react-test-renderer'
 import Enzyme, { shallow, mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import App from './'
-import Alert, { Button, Message } from '../Alert'
+import Alert from '../Alert'
+import { Button, Message } from '../Alert/styled'
 import Tile from '../Tile'
 
 Enzyme.configure({ adapter: new Adapter() })
