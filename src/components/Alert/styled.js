@@ -15,6 +15,7 @@ export const Message = styled.p`
 `
 
 export const Button = styled.div`
+  cursor: pointer;
   text-align: center;
   border: 1px solid ${COLORS.blue};
   color: ${COLORS.blue};

@@ -29,6 +29,7 @@ export const Container = styled.div`
 `
 
 const Tile = styled.div`
+  cursor: pointer;
   position: absolute;
   width: 100px;
   height: 100px;
