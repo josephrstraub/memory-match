@@ -6,7 +6,7 @@ import Adapter from 'enzyme-adapter-react-16'
 import App from './'
 import Alert from '../Alert'
 import { Button, Message } from '../Alert/styled'
-import Tile from '../Tile'
+import Tile from '../Tiles/Tile'
 
 Enzyme.configure({ adapter: new Adapter() })
 

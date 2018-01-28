@@ -1,38 +1,31 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
-import { ThemeProvider } from 'styled-components'
 import Alert from '../src/components/Alert'
 import Clock from '../src/components/Clock'
-import Tile from '../src/components/Tile'
-import { theme } from '../src/components/App'
+import Tile from '../src/components/Tiles/Tile'
 
 storiesOf('Alert', module)
   .add('default', () => (
-    <ThemeProvider theme={theme}>
-      <Alert
-        buttonText="Got it!"
-        handleDismiss={action('clicked')}
-        message="Click a square to reveal it, then find its match. Finish before time runs out!"
-      />
-    </ThemeProvider>
+    <Alert
+      buttonText="Got it!"
+      handleDismiss={action('clicked')}
+      message="Click a square to reveal it, then find its match. Finish before time runs out!"
+    />
   ))
 
 storiesOf('Clock', module)
   .add('default', () => (
-    <ThemeProvider theme={theme}>
-      <Clock display="40" />
-    </ThemeProvider>
+    <Clock display={40} />
+  ))
+  .add('danger', () => (
+    <Clock display={3} theme="danger" />
   ))
 
 storiesOf('Tile', module)
   .add('hidden', () => (
-    <ThemeProvider theme={theme}>
-      <Tile handleClick={action('clicked')} />
-    </ThemeProvider>
+    <Tile handleClick={action('clicked')} />
   ))
   .add('visible', () => (
-    <ThemeProvider theme={theme}>
-      <Tile backFaceIsVisible handleClick={action('clicked')} />
-    </ThemeProvider>
+    <Tile backFaceIsVisible iconName="football" handleClick={action('clicked')} />
   ))

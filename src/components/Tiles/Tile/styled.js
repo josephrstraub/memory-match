@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components'
+import COLORS from '../../../constants/colors'
 
 const revealBack = keyframes`
   from { transform: rotateY(0deg); }
@@ -8,16 +9,14 @@ const revealFront = keyframes`
   from { transform: rotateY(180deg); }
   to { transform: rotateY(0deg); }
 `
-export const theme = (rootTheme) => ({
+export const theme = {
   back: {
-    ...rootTheme,
     animation: `${revealBack} 500ms linear forwards`
   },
   front: {
-    ...rootTheme,
     animation: `${revealFront} 500ms linear forwards`
   }
-})
+}
 
 export const Container = styled.div`
   position: relative;
@@ -29,21 +28,20 @@ export const Container = styled.div`
   margin: 5px;
 `
 
-export const Front = styled.div`
+const Tile = styled.div`
   position: absolute;
   width: 100px;
   height: 100px;
-  background-color: ${props => props.theme.blue};
-  z-index: 1;
   backface-visibility: hidden;
 `
 
-export const Back = styled.div`
-  position: absolute;
-  width: 100px;
-  height: 100px;
+export const Front = Tile.extend`
+  background-color: ${COLORS.blue};
+  z-index: 1;
+`
+
+export const Back = Tile.extend`
   background-color: white;
   transform: rotateY(180deg);
-  backface-visibility: hidden;
-  border: 1px solid ${props => props.theme.blue};
+  border: 1px solid ${COLORS.blue};
 `

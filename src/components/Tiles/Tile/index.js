@@ -11,7 +11,7 @@ type Props = {
 
 const Tile = (props: Props) => (
   <div onClick={props.handleClick}>
-    <ThemeProvider theme={(rootTheme) => theme(rootTheme)[props.backFaceIsVisible ? 'back' : 'front']}>
+    <ThemeProvider theme={theme[props.backFaceIsVisible ? 'back' : 'front']}>
       <Container>
         <Front />
         <Back>

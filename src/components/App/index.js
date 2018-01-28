@@ -1,12 +1,10 @@
 /* @flow */
 import * as React from 'react'
 import _ from 'lodash'
-import { ThemeProvider } from 'styled-components'
-import { TileContainer, theme } from './styled'
 import Alert from '../Alert'
 import Clock from '../Clock'
-import Tile from '../Tile'
-import iconNames from '../../constants/icons-names'
+import Tiles from '../Tiles'
+import iconNames from '../../constants/icon-names'
 
 type State = {
   gameIsActive: boolean,
@@ -147,33 +145,24 @@ class App extends React.Component<State> {
     const statsMessage = `Good effort. You completed ${this.state.roundsCompleted} rounds.`
 
     return (
-      <ThemeProvider theme={theme}>
+      <div>
+        <Clock display={this.state.timeRemaining} />
         <div>
-          <Clock display={this.state.timeRemaining} />
-          <div>
-            { !this.state.gameIsActive && (
-              <Alert
-                buttonText={this.state.roundsCompleted ? 'Go again' : 'Got it!'}
-                handleDismiss={(event) => {
-                  event.preventDefault()
-                  this.startGame(0)
-                }}
-                message={this.state.roundsCompleted ? statsMessage : defaultMessage}
-              />
-            )}
-          </div>
-          <TileContainer>
-            { this.state.gameIsActive && this.state.tiles.map((tile, index) => (
-              <Tile
-                key={index}
-                backFaceIsVisible={tile.backFaceIsVisible}
-                handleClick={() => this.handleTileClick(tile, index)}
-                iconName={tile.iconName}
-              />
-            ))}
-          </TileContainer>
+          { !this.state.gameIsActive && (
+            <Alert
+              buttonText={this.state.roundsCompleted ? 'Go again' : 'Got it!'}
+              handleDismiss={(event) => {
+                event.preventDefault()
+                this.startGame(0)
+              }}
+              message={this.state.roundsCompleted ? statsMessage : defaultMessage}
+            />
+          )}
         </div>
-      </ThemeProvider>
+        { this.state.gameIsActive
+            && <Tiles tiles={this.state.tiles} handleTileClick={this.handleTileClick} />
+        }
+      </div>
     )
   }
 }
