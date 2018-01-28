@@ -24,6 +24,7 @@ class App extends React.Component<State> {
       numberOfVisibleUnmatchedTiles: 0,
       roundsCompleted: 0,
       tiles: [],
+      timeoutId: null,
       timeRemaining: 40
     }
   }
@@ -75,37 +76,44 @@ class App extends React.Component<State> {
   }
 
   handleTileClick: Function = (selectedTile: Object, index: number) => {
-    if (!selectedTile.backFaceIsVisible && this.state.numberOfVisibleUnmatchedTiles !== 2) {
-      const isMatched = this.state.tiles.some(tile => tile.id === selectedTile.id
-        && tile.backFaceIsVisible
-      )
-      this.setState(
-        {
-          numberOfVisibleUnmatchedTiles: this.state.numberOfVisibleUnmatchedTiles + 1,
-          tiles: this.state.tiles.map((tile, i) => ({
-            ...tile,
-            backFaceIsVisible: i === index || tile.backFaceIsVisible,
-            isMatched: tile.isMatched || tile.id === selectedTile.id && isMatched
-          }))
-        },
-        () => {
-          if (this.state.numberOfVisibleUnmatchedTiles === 2) {
-            this.checkForRoundCompletion()
-            setTimeout(this.resetTurn, 2000)
+    if (!selectedTile.backFaceIsVisible) {
+      if (this.state.numberOfVisibleUnmatchedTiles === 2) {
+        clearTimeout(this.state.timeoutId)
+        this.resetTurn(() => this.handleTileClick(selectedTile, index))
+      } else {
+        const isMatched = this.state.tiles.some(tile => tile.id === selectedTile.id
+          && tile.backFaceIsVisible
+        )
+        this.setState(
+          {
+            numberOfVisibleUnmatchedTiles: this.state.numberOfVisibleUnmatchedTiles + 1,
+            tiles: this.state.tiles.map((tile, i) => ({
+              ...tile,
+              backFaceIsVisible: i === index || tile.backFaceIsVisible,
+              isMatched: tile.isMatched || tile.id === selectedTile.id && isMatched
+            }))
+          },
+          () => {
+            if (this.state.numberOfVisibleUnmatchedTiles === 2) {
+              this.checkForRoundCompletion()
+              this.setState({
+                timeoutId: setTimeout(this.resetTurn, 2000)
+              })
+            }
           }
-        }
-      )
+        )
+      }
     }
   }
 
-  resetTurn: Function = () => {
+  resetTurn: Function = (callback: Function) => {
     this.setState({
       numberOfVisibleUnmatchedTiles: 0,
       tiles: this.state.tiles.map(tile => ({
         ...tile,
         backFaceIsVisible: tile.isMatched
       }))
-    })
+    }, callback)
   }
 
   startGame: Function = (roundsCompleted = this.state.roundsCompleted) => {
