@@ -90,13 +90,8 @@ class App extends React.Component<State> {
         },
         () => {
           if (this.state.numberOfVisibleUnmatchedTiles === 2) {
-            setTimeout(
-              () => {
-                this.resetTurn()
-                this.checkForRoundCompletion()
-              },
-              2000
-            )
+            this.checkForRoundCompletion()
+            setTimeout(this.resetTurn, 2000)
           }
         }
       )
