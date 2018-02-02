@@ -23,4 +23,8 @@ export const Button = styled.div`
   padding: 10px 0;
   width: 80%;
   margin: 0 auto;
+  transition: transform 500ms;
+  &:hover {
+    transform: scale(1.05);
+  }
 `
